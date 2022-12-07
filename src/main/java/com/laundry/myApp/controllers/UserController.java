@@ -1,28 +1,30 @@
 package com.laundry.myApp.controllers;
 
-import javax.validation.Valid;
 
-import com.laundry.myApp.controllers.dto.UserProfileDto;
-import com.laundry.myApp.controllers.form.RegistrationFormDto;
+
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.laundry.myApp.dto.UserDto;
 import com.laundry.myApp.models.Role;
 import com.laundry.myApp.models.User;
 import com.laundry.myApp.repository.RoleRepository;
 import com.laundry.myApp.repository.UserRepository;
+//import com.laundry.myApp.service.UserService;
+import com.laundry.myApp.service.UserService;
 
-
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,43 +39,47 @@ public class UserController {
 	@Autowired
 	private RoleRepository roleRepository;
 	
-			 
+	  private UserService userService;
+	 
+	  public UserController(UserService userService) { this.userService =
+	  userService; }
+	 
+
+	// handler method to handle login request
+	@GetMapping("/login")
+	public String loginForm(){
+		return "login";
+	}
 
 	@GetMapping("/new")
 	public String addUser(Model model) {
 		model.addAttribute("user", new User());
 		return "/register";
 	}
+	   @PostMapping("/save")
+	    public String registration(@Valid @ModelAttribute("user") UserDto user,
+	                               BindingResult result,
+	                               Model model){
+	        User existing = userService.findUserByEmail(user.getEmail());
+	        if (existing != null) {
+	            result.rejectValue("email", null, "There is already an account registered with that email");
+	        }
+	        if (result.hasErrors()) {
+	            model.addAttribute("user", user);
+	            return "/register";
+	        }
+	        userService.saveUser(user);
+	      //  attributes.addFlashAttribute("message", "Information added succesfully!");
+			return "redirect:/user/new";
+	   
+	   }
 
-	@PostMapping("/save")
-	public String saveUser(@Valid User user, BindingResult result, Model model, RedirectAttributes attributes) throws Exception {
-		if (result.hasErrors()) {
-			return "/register";
-		}
 
-		// check if the user already exist
 
-		User usr = userRepository.findByUsername(user.getUsername());
-		if (usr != null) {
-			model.addAttribute("usernameExist", "Username already exist");
-			return "/register";
-
-		}
-
-		// search for a user's role
-		Role role = roleRepository.findByRole("USER");
-		List<Role> roles = new ArrayList<Role>();
-		roles.add(role);
-		user.setRoles(roles); // connect the role with the user
 		
-				
-		//saving a user
 		
-		userRepository.save(user);
-		attributes.addFlashAttribute("message", "Information added succesfully!");
-		return "redirect:/user/new";
-
-	}
+		
+	
 
 	// method to bring the user list in the admin html
 	@RequestMapping("/admin/list")

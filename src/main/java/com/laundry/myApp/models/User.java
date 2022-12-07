@@ -1,8 +1,6 @@
 package com.laundry.myApp.models;
 
-import java.util.Date;
 
-import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,55 +10,46 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 
-import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
 
 
+
 @Entity
-@Table(name = "user")
-
-
+@Table(name="user")
 public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	@NotNull
-	@Size(min = 3, message = "Name must be at least 3 characters long")
+	@Column(nullable = false)
 	private String name;
-
-	@Email(message = "invalid e-mail")
+	@Column(nullable = false, unique = true)
 	private String email;
-
-	@NotEmpty(message = "The username must be informed")
-	@Size(min = 4, message = "Your username must be at least 4 characters long")
+	@Column(nullable = false)
 	private String username;
-
-	@NotEmpty(message = "Your password must be informed")
-	@Size(min = 3, message = "Your password must be at least 3 characters long")
+	@Column(nullable = false)
 	private String password;
 
 	private boolean enable;
 	
-	 @ManyToMany(fetch=FetchType.EAGER)	 
-	@JoinTable(name="user_role", joinColumns = @JoinColumn(name = "user_id"),
-			  inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private List<Role> roles;
+	@ManyToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+    @JoinTable(
+            name="users_roles",
+            joinColumns={@JoinColumn(name="USER_ID", referencedColumnName="ID")},
+            inverseJoinColumns={@JoinColumn(name="ROLE_ID", referencedColumnName="ID")})
+    private List<Role> roles = new ArrayList<>();
 
-	
+
+
+
 //getters and setters
 	public Long getId() {
 		return id;
@@ -109,6 +98,7 @@ public class User {
 	public void setEnable(boolean enable) {
 		this.enable = enable;
 	}
+
 
 	public List<Role> getRoles() {
 		return roles;

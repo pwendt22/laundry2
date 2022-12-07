@@ -1,24 +1,20 @@
-import com.laundry.myApp.controllers.form.RegistrationFormDto;
-import com.laundry.myApp.models.Role;
-import com.laundry.myApp.models.User;
-import com.laundry.myApp.repository.UserRepository;
-import com.laundry.myApp.services.exception.UserNotFoundException;
 
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-@Service
-
-public class UserService {
-
-    private UserRepository userRepository;
-    
-    User findUserByEmail(String email);
-
-    public List<User> getAll() {
-        return userRepository.findAll();
-    }
-}
+  package com.laundry.myApp.service;
+  
+  import com.laundry.myApp.dto.UserDto;
+ import com.laundry.myApp.models.User;
+  
+  
+  import java.util.List;
+  
+  public interface UserService {
+  
+ void saveUser(UserDto userDto);
+	  
+  User findUserByEmail(String email);
+  
+   
+  User findUserByUsername(String username);
+  
+  List<UserDto> findAllUsers(); }
+ 

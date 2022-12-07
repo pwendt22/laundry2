@@ -17,10 +17,7 @@ public ModelAndView index() {
 	return mv;
 	}
 
-	  @RequestMapping("/login")
-	  public String login(){
-		  return "login"; }
-	  
+
 
 }
 		
